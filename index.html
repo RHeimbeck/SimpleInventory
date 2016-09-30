@@ -1,0 +1,50 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Inventory App</title>
+</head>
+<body>
+
+    <div>
+        <h2>All Items</h2>
+        <ul id="allItems" />
+    </div>
+    <div>
+        <h2>Search by Label</h2>
+        <input type="text" id="prodLabel" size="20" />
+        <input type="button" value="Search" onclick="find();" />
+        <p id="item" />
+    </div>
+
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+    var uri = 'api/inventory';
+
+    $(document).ready(function () {
+      // Send an AJAX request
+      $.getJSON(uri)
+          .done(function (data) {
+            // On success, 'data' contains a list of products.
+            $.each(data, function (key, item) {
+              // Add a list item for the product.
+              $('<li>', { text: formatItem(item) }).appendTo($('#allItems'));
+            });
+          });
+    });
+
+    function formatItem(item) {
+      return item.label + ' expiration:' + item.expiration + ' type:' + item.type;
+    }
+
+    function find() {
+      var label = $('#prodLabel').val();
+      $.getJSON(uri + '/' + label)
+          .done(function (data) {
+            $('#item').text(formatItem(data));
+          })
+          .fail(function (jqXHR, textStatus, err) {
+            $('#item').text('Error: ' + err);
+          });
+    }
+    </script>
+</body>
+</html>

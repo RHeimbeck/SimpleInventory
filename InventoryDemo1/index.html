@@ -1,0 +1,104 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Inventory App</title>
+</head>
+<body>
+
+    <div>
+        <h2>All Items</h2>
+        <ul id="allItems" />
+    </div>
+    <div>
+        <h2>Search by Label</h2>
+        <input type="text" id="findLabel" size="20" />
+        <input type="button" value="Search" onclick="find();" />
+        <p id="findItem" />
+    </div>
+    <div>
+        <h2>Add Item</h2>
+        <input type="text" id="addLabel" size="20" />
+        <input type="text" id="addExp" size="20" />
+        <input type="text" id="addType" size="20" />
+        <input type="button" value="Add" onclick="addItem();" />
+        <p id="addItem" />
+    </div>
+    <div>
+        <h2>Remove Item</h2>
+        <input type="text" id="removeLabel" size="20" />
+        <input type="button" value="Remove" onclick="removeItem();" />
+        <p id="removeItem" />
+    </div>
+
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script>
+    var uri = 'api/inventory';
+
+    $(document).ready(function () {
+        getAll();
+    });
+
+    function getAll() {
+        // Send an AJAX request
+        $.getJSON(uri)
+            .done(function (data) {
+                // On success, 'data' contains a list of products.
+                $('#allItems').text('');
+                $.each(data, function (key, item) {
+                    // Add a list item for the product.
+                    $('<li>', { text: formatItem(item) }).appendTo($('#allItems'));
+                });
+            });
+    }
+
+    function formatItem(item) {
+      return 'item:' + item.label + ', expiration:' + item.expiration + ', type:' + item.type;
+    }
+
+    function find() {
+      var label = $('#findLabel').val();
+      $.getJSON(uri + '/' + label)
+          .done(function (data) {
+            $('#findItem').text(formatItem(data));
+          })
+          .fail(function (jqXHR, textStatus, err) {
+            $('#findItem').text('Error: ' + err);
+          });
+    }
+    function addItem() {
+        var label = $('#addLabel').val();
+        var expiration = $('#addExp').val();
+        var type = $('#addType').val();
+        $.ajax({
+            method: "POST",
+            url: uri + '/' + label,
+            data: { label: label, expiration: expiration, type:type}
+        })
+        .done(function (item) {
+            $('#addItem').text("Item Added: " + item.label);
+            getAll();
+        })
+        .fail(function (jqXHR, textStatus, err) {
+            $('#addItem').text('Error: ' + err);
+        });
+    }
+
+    function removeItem() {
+        var label = $('#removeLabel').val();
+        $.ajax({
+            method: "DELETE",
+            url: uri + '/' + label,
+            data: { label: label}
+        })
+        .done(function (item) {
+            $('#removeItem').text("Item Removed:" + item.label);
+            getAll();
+        })
+        .fail(function (jqXHR, textStatus, err) {
+            $('#removeItem').text('Error: ' + err);
+        });
+    }
+
+
+    </script>
+</body>
+</html>
