@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -48,7 +47,7 @@ namespace InventoryDemo1.Controllers
             }
             item = repository.Add(item);
             var response = Request.CreateResponse<InventoryItem>(HttpStatusCode.Created, item);
-            response.Headers.Location = new Uri(Request.RequestUri, "api/inventoryitems/" + item.label);
+            response.Headers.Location = Request.RequestUri; // new Uri(Request.RequestUri, item.label);
             // ** Send Notification message to user
             System.Diagnostics.Debug.WriteLine(String.Format("Added new inventory item: {0}", item.label));
             return response;
