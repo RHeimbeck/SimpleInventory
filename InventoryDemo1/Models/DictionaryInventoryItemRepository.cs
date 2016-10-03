@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace InventoryDemo1.Models
 {
@@ -15,6 +14,7 @@ namespace InventoryDemo1.Models
         private Dictionary<string, InventoryItem> inventoryItems = new Dictionary<string, InventoryItem>();
         private static volatile DictionaryInventoryRepository instance;
         private static object syncRoot = new Object();
+        private static object dataAccess = new Object();
 
         private DictionaryInventoryRepository() {
             // Seed the Inventory to have some initial data
@@ -29,6 +29,7 @@ namespace InventoryDemo1.Models
             {
                 if (instance == null)
                 {
+                    // prevent multiple threads from being the one to create this singelton.
                     lock (syncRoot)
                     {
                         if (instance == null)
@@ -52,19 +53,30 @@ namespace InventoryDemo1.Models
 
         public InventoryItem Add(InventoryItem item)
         {
-            inventoryItems[item.label] = item;
+            lock (dataAccess) // only allow one thread at a time to add, modify, or remove data
+            {
+                inventoryItems[item.label] = item;
+            }
             return item;
         }
 
         public InventoryItem Update(InventoryItem item)
         {
-            inventoryItems[item.label] = item;
+            lock (dataAccess) // only allow one thread at a time to add, modify, or remove data
+            {
+                inventoryItems[item.label] = item;
+            }
             return item;
         }
 
         public bool Delete(string label)
         {
-            return inventoryItems.Remove(label);
+            bool status;
+            lock (dataAccess) // only allow one thread at a time to add, modify, or remove data
+            {
+                status = inventoryItems.Remove(label);
+            }
+            return status;
         }
     }
 }

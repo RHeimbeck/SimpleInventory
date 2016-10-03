@@ -17,9 +17,7 @@ namespace InventoryDemo1.Service
             while(true)
             {
                 InventoryItem[] expiredInventoryItems = this.repository.Get().Where(e => e.expiration < DateTime.Now).ToArray();
-                // ****
-                // Insert Repository Lock here
-                // ****
+
                 for(var i = 0; i < expiredInventoryItems.Length; i++)
                 {
                     var label = expiredInventoryItems[i].label;
@@ -27,9 +25,6 @@ namespace InventoryDemo1.Service
                     System.Diagnostics.Debug.WriteLine(String.Format("Expired Item: {0} automatically removed from inventory", label));
                     this.repository.Delete(label);
                 }
-                // ****
-                // Insert Repository UnLock here
-                // ****
                 Thread.Sleep(1000);   
             }
         }
