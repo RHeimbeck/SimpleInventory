@@ -30,7 +30,7 @@ The inventory data is held in a local repository which is implemented as a singl
 
 The automatic data expiring service runs in its own thread, and wakes up once a second to check for expired data.
 
-The unit tests were implemented in their own directory, separate from the main project code, as is standard practice for code and test separation/organization.  There is a separate unit test file for each of the API methods.
+The unit tests were implemented in their own directory, separate from the main project code, as is standard practice for code and test separation/organization.  There is a separate unit test file for each of the API methods.  The unit test cover just the basic, positive test cases at this time.  This was a trade-off for time to complete this demo project.
 
 ### Assumptions for this Simple Inventory ASP.Net application
 1.  Inventory items are only specified by their "label" attribute.
@@ -42,3 +42,5 @@ The unit tests were implemented in their own directory, separate from the main p
 4.  The mechanism for automatically removing expired items runs as a separate, stand-alone thread.  This thread wakes-up every second to check the inventory for expired items.  If an item has expired, it is removed from the data store, and a debug console message is displayed for notification.  This 'expiring' mechanism does not take into account how many items are in the inventory so it could potentialy take a significant amount of time and resources to run if the data store contained a large amount of items.  Ideally this mechanism would have built-in throttling so that it would not tie-up computer resources and the data repository.
 
 5.  The REST API for the inventory system uses the basic HTTP verbs to provide CRUD data access (minus the 'U' at this time.).
+
+6.  This demo app only supports routes for the Inventory system based on 'Label' parameter input at this time.  This was done by modifying the default route template.  For extensibility, this would need to be changed later so the default used 'id' as the parameter which is commonly used in REST apis.
