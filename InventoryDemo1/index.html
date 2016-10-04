@@ -58,7 +58,13 @@
       var label = $('#findLabel').val();
       $.getJSON(uri + '/' + label)
           .done(function (data) {
-            $('#findItem').text(formatItem(data));
+              if (data) {
+                  $('#findItem').text(formatItem(data));
+              }
+              else {
+                  $('#findItem').text('Item Not Found');
+              }
+            
           })
           .fail(function (jqXHR, textStatus, err) {
             $('#findItem').text('Error: ' + err);
@@ -90,8 +96,14 @@
             data: { label: label}
         })
         .done(function (item) {
-            $('#removeItem').text("Item Removed:" + item.label);
-            getAll();
+            if (item) {
+                $('#removeItem').text("Item Removed:" + item.label);
+                getAll();
+            }
+            else {
+                $('#removeItem').text("Item Not Found");
+            }
+
         })
         .fail(function (jqXHR, textStatus, err) {
             $('#removeItem').text('Error: ' + err);

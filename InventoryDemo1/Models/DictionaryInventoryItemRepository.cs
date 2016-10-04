@@ -18,8 +18,8 @@ namespace InventoryDemo1.Models
 
         private DictionaryInventoryRepository() {
             // Seed the Inventory to have some initial data
-            inventoryItems.Add("soup", new InventoryItem{ label = "soup", expiration = new DateTime(2016, 10, 1), type = "Campbells" } );
-            inventoryItems.Add("nuts", new InventoryItem { label = "nuts", expiration = new DateTime(2016, 9, 30), type = "Planters" });
+            inventoryItems.Add("soup", new InventoryItem{ label = "soup", expiration = new DateTime(2020, 10, 1), type = "Campbells" } );
+            inventoryItems.Add("nuts", new InventoryItem { label = "nuts", expiration = new DateTime(2020, 9, 30), type = "Planters" });
             inventoryItems.Add("kitchensink", new InventoryItem { label = "kitchensink", expiration = new DateTime(2016, 9, 29), type = "Elgin" });
         }
 
@@ -43,17 +43,27 @@ namespace InventoryDemo1.Models
 
         public IEnumerable<InventoryItem> Get()
         {
-            return inventoryItems.Values.OrderBy(inventoryItem => inventoryItem.label);
+            IEnumerable<InventoryItem> items;
+            lock (dataAccess) // only allow one thread at a time to read, add, modify, or remove data
+            {
+                items = inventoryItems.Values.OrderBy(inventoryItem => inventoryItem.label);
+            }
+            return items;
         }
 
         public bool TryGet(string label, out InventoryItem item)
         {
-            return inventoryItems.TryGetValue(label, out item);
+            bool status;
+            lock (dataAccess) // only allow one thread at a time to read, add, modify, or remove data
+            {
+                status = inventoryItems.TryGetValue(label, out item);
+            }
+            return status;
         }
 
         public InventoryItem Add(InventoryItem item)
         {
-            lock (dataAccess) // only allow one thread at a time to add, modify, or remove data
+            lock (dataAccess) // only allow one thread at a time to read, add, modify, or remove data
             {
                 inventoryItems[item.label] = item;
             }
@@ -62,7 +72,7 @@ namespace InventoryDemo1.Models
 
         public InventoryItem Update(InventoryItem item)
         {
-            lock (dataAccess) // only allow one thread at a time to add, modify, or remove data
+            lock (dataAccess) // only allow one thread at a time to read, add, modify, or remove data
             {
                 inventoryItems[item.label] = item;
             }
@@ -72,7 +82,7 @@ namespace InventoryDemo1.Models
         public bool Delete(string label)
         {
             bool status;
-            lock (dataAccess) // only allow one thread at a time to add, modify, or remove data
+            lock (dataAccess) // only allow one thread at a time to read, add, modify, or remove data
             {
                 status = inventoryItems.Remove(label);
             }

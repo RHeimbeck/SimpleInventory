@@ -78,7 +78,8 @@ namespace InventoryDemo1.Controllers
             InventoryItem item;
             if (!repository.TryGet(label, out item))
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                // return NoContent - the server processed the request but the resource was not found.
+                throw new HttpResponseException(HttpStatusCode.NoContent);
             }
             return item;
         }
